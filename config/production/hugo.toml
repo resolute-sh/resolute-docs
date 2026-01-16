@@ -1,2 +1,4 @@
 # Overrides for production environment
-baseurl = "https://resolute.sh/docs/"
+# baseurl is set via HUGO_BASEURL env var in deployment platform
+# For resolute.sh: https://resolute.sh/docs/
+# For Vercel preview: https://resolute-docs.vercel.app/

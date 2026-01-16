@@ -22,6 +22,10 @@ flow := core.NewFlow("knowledge-sync").
     Then(transform.ChunkDocuments(transform.Input{
         DocumentsRef: core.OutputRef("jira_issues"),
     })).
+    Then(ollama.BatchEmbed(ollama.Input{
+        Model:     "nomic-embed-text",
+        TextsRef:  core.OutputRef("chunks"),
+    })).
     Then(qdrant.Upsert(qdrant.Input{
         Collection: "knowledge-base",
     })).
