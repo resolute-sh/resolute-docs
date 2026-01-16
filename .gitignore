@@ -4,3 +4,7 @@
 node_modules
 public
 resources
+
+# macOS
+.DS_Store
+._*
