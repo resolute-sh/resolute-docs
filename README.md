@@ -1,6 +1,6 @@
 # Resolute Documentation
 
-Documentation site for [Resolute](https://github.com/resolute-sh/resolute) — Workflow Orchestration as Code for Go.
+Documentation site for [Resolute](https://github.com/resolute-sh/resolute) — Agent Orchestration as Code for Go.
 
 ## Local Development
 

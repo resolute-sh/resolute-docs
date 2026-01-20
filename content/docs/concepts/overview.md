@@ -8,7 +8,7 @@ toc: true
 
 # Concepts Overview
 
-Resolute is an **Orchestration as Code** framework that provides type-safe, composable abstractions over Temporal workflows. It lets you define complex workflows as code while inheriting Temporal's durability guarantees.
+Resolute is an **Agent Orchestration as Code** framework that provides type-safe, composable abstractions over Temporal workflows. It lets you define complex workflows as code while inheriting Temporal's durability guarantees.
 
 ## Design Philosophy
 

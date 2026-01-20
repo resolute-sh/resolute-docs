@@ -1,7 +1,7 @@
 {
   "name": "resolute-docs",
   "version": "1.0.0",
-  "description": "Resolute documentation - Orchestration as Code for Go",
+  "description": "Resolute documentation - Agent Orchestration as Code for Go",
   "author": "Resolute",
   "license": "MIT",
   "repository": {

@@ -1,6 +1,6 @@
 ---
 title: "Documentation"
-description: "Resolute documentation - Orchestration as Code for Go"
+description: "Resolute documentation - AgentOrchestration as Code for Go"
 weight: 1
 ---
 
@@ -8,7 +8,7 @@ weight: 1
 
 [![Version](https://img.shields.io/badge/version-v0.1.0--alpha-blue)](https://github.com/resolute-sh/resolute/releases) [![Go](https://img.shields.io/badge/Go-1.22+-00ADD8?logo=go)](https://go.dev) [![License](https://img.shields.io/badge/license-MIT-green)](https://github.com/resolute-sh/resolute/blob/main/LICENSE)
 
-**Orchestration as Code** - Build fault-tolerant workflows with Go.
+**Agent Orchestration as Code** - Build fault-tolerant workflows with Go.
 
 Resolute is a workflow framework built on [Temporal](https://temporal.io) that lets you define complex, long-running workflows using familiar Go code. It provides a developer-friendly abstraction layer while maintaining Temporal's durability guarantees.
 

@@ -1,6 +1,6 @@
 # Hugo
 title = "Resolute"
-description = "Orchestration as Code - Build fault-tolerant workflows with Go"
+description = "AgentOrchestration as Code - Build fault-tolerant workflows with Go"
 images = ["resolute-social-card.png"]
 
 # mainSections
