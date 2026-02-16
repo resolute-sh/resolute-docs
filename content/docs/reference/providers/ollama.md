@@ -226,38 +226,41 @@ embedNode := ollama.Embed(ollama.EmbedInput{
 })
 ```
 
-### EmbedBatch
+### BatchEmbed
 
-Generates embeddings for a batch of texts with automatic batching.
+Generates embeddings for documents from a DataRef. Uses the batch `/api/embed` endpoint with concurrent requests for throughput.
+
+Internally processes documents in batches of 256 texts with 4 concurrent workers via `errgroup`.
 
 **Input:**
 ```go
-type EmbedBatchInput struct {
-    Model     string   `json:"model"`
-    Texts     []string `json:"texts"`
-    BatchSize int      `json:"batch_size"` // Texts per batch (default: 32)
+type BatchEmbedInput struct {
+    BaseURL      string
+    Model        string
+    DocumentsRef core.DataRef
 }
 ```
 
 **Output:**
 ```go
-type EmbedBatchOutput struct {
-    Embeddings [][]float32 `json:"embeddings"`
-    Count      int         `json:"count"`
+type BatchEmbedOutput struct {
+    Ref    core.DataRef
+    Count  int
+    Failed int
 }
 ```
 
 **Node Factory:**
 ```go
-func EmbedBatch(input EmbedBatchInput) *core.Node[EmbedBatchInput, EmbedBatchOutput]
+func BatchEmbed(input BatchEmbedInput) *core.Node[BatchEmbedInput, BatchEmbedOutput]
 ```
 
 **Example:**
 ```go
-embedBatchNode := ollama.EmbedBatch(ollama.EmbedBatchInput{
-    Model:     "nomic-embed-text",
-    Texts:     documentTexts, // Can be hundreds of texts
-    BatchSize: 64,
+embedNode := ollama.BatchEmbed(ollama.BatchEmbedInput{
+    BaseURL:      "http://ollama:11434",
+    Model:        "nomic-embed-text",
+    DocumentsRef: core.OutputRef("chunks"),
 })
 ```
 
@@ -337,10 +340,10 @@ flow := core.NewFlow("text-generator").
 flow := core.NewFlow("embedding-pipeline").
     TriggeredBy(core.Schedule("0 2 * * *")).
     Then(fetchDocumentsNode.As("docs")).
-    Then(ollama.EmbedBatch(ollama.EmbedBatchInput{
-        Model:     "nomic-embed-text",
-        Texts:     core.Output("docs.texts"),
-        BatchSize: 32,
+    Then(ollama.BatchEmbed(ollama.BatchEmbedInput{
+        BaseURL:      "http://ollama:11434",
+        Model:        "nomic-embed-text",
+        DocumentsRef: core.OutputRef("docs"),
     }).As("embeddings")).
     Then(storeVectorsNode).
     Build()
@@ -431,10 +434,10 @@ func main() {
             return len(docs.Documents) > 0
         }).
             Then(processDocsNode.As("processed")).
-            Then(ollama.EmbedBatch(ollama.EmbedBatchInput{
-                Model:     "nomic-embed-text",
-                Texts:     core.Output("processed.texts"),
-                BatchSize: 32,
+            Then(ollama.BatchEmbed(ollama.BatchEmbedInput{
+                BaseURL:      "http://localhost:11434",
+                Model:        "nomic-embed-text",
+                DocumentsRef: core.OutputRef("processed"),
             }).As("embeddings")).
             Then(qdrant.Upsert(qdrant.UpsertInput{
                 Collection: "documents",

@@ -306,44 +306,48 @@ webhookServer := worker.WebhookServer()
 
 ## Health Checks
 
-Implement health endpoints for orchestrators:
+Use `WithHealthServer` to enable Kubernetes-compatible health endpoints:
 
 ```go
-package main
-
-import (
-    "net/http"
-    "sync/atomic"
-
-    "github.com/resolute/resolute/core"
-)
-
-var healthy int32 = 1
-
-func main() {
-    // Health endpoint
-    http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
-        if atomic.LoadInt32(&healthy) == 1 {
-            w.WriteHeader(http.StatusOK)
-            w.Write([]byte("ok"))
-        } else {
-            w.WriteHeader(http.StatusServiceUnavailable)
-        }
-    })
-    go http.ListenAndServe(":8081", nil)
-
-    // Run worker
-    err := core.NewWorker().
-        WithConfig(cfg).
-        WithFlow(flow).
-        Run()
-
-    atomic.StoreInt32(&healthy, 0)
-    if err != nil {
-        log.Fatal(err)
-    }
-}
+err := core.NewWorker().
+    WithConfig(cfg).
+    WithFlow(flow).
+    WithHealthServer(":8081").
+    Run()
 ```
+
+This starts three endpoints:
+
+| Endpoint | Purpose | K8s Probe |
+|----------|---------|-----------|
+| `/health/live` | Process is alive | `livenessProbe` |
+| `/health/ready` | Worker is accepting work | `readinessProbe` |
+| `/health/startup` | Worker has started | `startupProbe` |
+
+All endpoints return JSON with `status` and `timestamp` fields. The ready and startup probes return `503 Service Unavailable` until the worker has fully initialized.
+
+## Metrics
+
+Enable Prometheus metrics with `WithMetrics`:
+
+```go
+err := core.NewWorker().
+    WithConfig(cfg).
+    WithFlow(flow).
+    WithMetrics(core.NewPrometheusExporter()).
+    Run()
+```
+
+Exported metrics:
+
+| Metric | Type | Labels | Description |
+|--------|------|--------|-------------|
+| `resolute_flow_executions_total` | Counter | `flow`, `status` | Total flow executions |
+| `resolute_flow_duration_seconds` | Histogram | `flow` | Flow execution duration |
+| `resolute_activity_duration_seconds` | Histogram | `node` | Activity execution duration |
+| `resolute_activity_errors_total` | Counter | `node`, `error_type` | Activity errors by type |
+| `resolute_rate_limiter_wait_seconds` | Histogram | `limiter` | Rate limiter wait time |
+| `resolute_state_operations_total` | Counter | `operation` | State backend operations |
 
 ## Logging
 
@@ -380,45 +384,29 @@ c, err := client.Dial(client.Options{
 
 ## Common Patterns
 
-### Environment-Based Configuration
+### Typed Configuration with LoadConfig
+
+Use `core.LoadConfig[T]` to load configuration from environment variables with validation:
 
 ```go
-package main
-
-import (
-    "os"
-    "strconv"
-
-    "github.com/resolute/resolute/core"
-)
-
-func configFromEnv() core.WorkerConfig {
-    maxConcurrent := 50
-    if v := os.Getenv("WORKER_MAX_CONCURRENT"); v != "" {
-        if n, err := strconv.Atoi(v); err == nil {
-            maxConcurrent = n
-        }
-    }
-
-    return core.WorkerConfig{
-        TaskQueue:     os.Getenv("TASK_QUEUE"),
-        TemporalHost:  os.Getenv("TEMPORAL_HOST"),
-        Namespace:     os.Getenv("TEMPORAL_NAMESPACE"),
-        MaxConcurrent: maxConcurrent,
-    }
+type JiraConfig struct {
+    BaseURL  string `env:"BASE_URL" required:"true"`
+    Email    string `env:"EMAIL" required:"true"`
+    APIToken string `env:"API_TOKEN" required:"true"`
+    Project  string `env:"PROJECT" required:"true"`
+    PageSize int    `env:"PAGE_SIZE" default:"100"`
 }
 
-func main() {
-    err := core.NewWorker().
-        WithConfig(configFromEnv()).
-        WithFlow(flow).
-        Run()
-
-    if err != nil {
-        log.Fatal(err)
-    }
-}
+cfg, err := core.LoadConfig[JiraConfig]("JIRA")
+// Reads: JIRA_BASE_URL, JIRA_EMAIL, JIRA_API_TOKEN, JIRA_PROJECT, JIRA_PAGE_SIZE
 ```
+
+Supported struct tags:
+- `env:"VAR_NAME"` — environment variable suffix (PREFIX_VAR_NAME)
+- `required:"true"` — fail if the variable is not set
+- `default:"value"` — fallback when the variable is not set
+
+Supported field types: `string`, `int`, `int64`, `bool`, `float64`, `time.Duration`
 
 ### Multiple Flows Per Worker
 
@@ -458,6 +446,50 @@ err := core.NewWorker().
     WithFlow(flow).
     WithProviders(jiraProvider, slackProvider).
     Run()
+```
+
+## Kubernetes Deployment
+
+A Helm chart is available for deploying workers to Kubernetes. See the `flows/knowledge-ingestion/deploy` directory for a reference implementation.
+
+### Deployment with Helm
+
+```bash
+# Default values
+helm upgrade --install my-worker ./deploy
+
+# Production overrides
+helm upgrade --install my-worker ./deploy -f ./deploy/values-production.yaml
+```
+
+The Helm chart supports:
+- Configurable image, resources, and replica count
+- ConfigMap for non-sensitive configuration
+- Secret management (inline or external `existingSecret`)
+- PersistentVolumeClaim for state storage
+- Health probe configuration pointing to the health server
+
+### Production Worker Example
+
+```go
+func main() {
+    cfg, err := LoadFlowConfig()
+    if err != nil {
+        log.Fatalf("config: %v", err)
+    }
+
+    err = core.NewWorker().
+        WithConfig(core.WorkerConfig{TaskQueue: "my-queue"}).
+        WithFlow(BuildFlow(cfg)).
+        WithProviders(myProviders...).
+        WithHealthServer(":8081").
+        WithMetrics(core.NewPrometheusExporter()).
+        Run()
+
+    if err != nil {
+        log.Fatalf("worker: %v", err)
+    }
+}
 ```
 
 ## See Also

@@ -6,7 +6,7 @@ weight: 1
 
 # Resolute
 
-[![Version](https://img.shields.io/badge/version-v0.1.0--alpha-blue)](https://github.com/resolute-sh/resolute/releases) [![Go](https://img.shields.io/badge/Go-1.22+-00ADD8?logo=go)](https://go.dev) [![License](https://img.shields.io/badge/license-MIT-green)](https://github.com/resolute-sh/resolute/blob/main/LICENSE)
+[![Version](https://img.shields.io/badge/version-v0.2.0--alpha-blue)](https://github.com/resolute-sh/resolute/releases) [![Go](https://img.shields.io/badge/Go-1.22+-00ADD8?logo=go)](https://go.dev) [![License](https://img.shields.io/badge/license-MIT-green)](https://github.com/resolute-sh/resolute/blob/main/LICENSE)
 
 **Agent Orchestration as Code** - Build fault-tolerant workflows with Go.
 

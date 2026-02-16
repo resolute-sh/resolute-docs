@@ -156,6 +156,48 @@ worker := core.NewWorker().
     WithWebhookServer(":8080")
 ```
 
+### WithHealthServer
+
+```go
+func (b *WorkerBuilder) WithHealthServer(addr string) *WorkerBuilder
+```
+
+Enables Kubernetes-compatible health endpoints on the specified address. Provides `/health/live`, `/health/ready`, and `/health/startup` endpoints.
+
+**Parameters:**
+- `addr` - Server address (e.g., ":8081")
+
+**Returns:** `*WorkerBuilder` for method chaining
+
+**Example:**
+```go
+worker := core.NewWorker().
+    WithConfig(cfg).
+    WithFlow(flow).
+    WithHealthServer(":8081")
+```
+
+### WithMetrics
+
+```go
+func (b *WorkerBuilder) WithMetrics(exporter MetricsExporter) *WorkerBuilder
+```
+
+Enables metrics collection with the provided exporter. Metrics are recorded for flow executions, activity durations, errors, and rate limiting.
+
+**Parameters:**
+- `exporter` - Metrics exporter implementation (e.g., `core.NewPrometheusExporter()`)
+
+**Returns:** `*WorkerBuilder` for method chaining
+
+**Example:**
+```go
+worker := core.NewWorker().
+    WithConfig(cfg).
+    WithFlow(flow).
+    WithMetrics(core.NewPrometheusExporter())
+```
+
 ### Build
 
 ```go
@@ -266,6 +308,20 @@ Returns the webhook server if configured.
 
 **Returns:** `*WebhookServer` or nil if not enabled or `Build()` not called
 
+### HealthServer
+
+```go
+func (b *WorkerBuilder) HealthServer() *HealthServer
+```
+
+Returns the health server if configured.
+
+**Returns:** `*HealthServer` or nil if not enabled or `Build()` not called
+
+## Schedule Auto-Creation
+
+When a flow has a `core.Schedule(...)` trigger, the worker automatically creates or updates a Temporal Schedule on startup. If the schedule already exists, it updates the cron expression and action. The schedule ID is derived from the flow name (`<flow-name>-schedule`). Overlap policy is set to Skip (concurrent runs are not started if one is already in progress).
+
 ## Environment Variables
 
 | Variable | Description | Default |
@@ -303,6 +359,26 @@ func main() {
         }).
         WithFlow(webhookFlow).
         WithWebhookServer(":8080").
+        Run()
+
+    if err != nil {
+        log.Fatal(err)
+    }
+}
+```
+
+### Worker with Health and Metrics
+
+```go
+func main() {
+    err := core.NewWorker().
+        WithConfig(core.WorkerConfig{
+            TaskQueue: "my-queue",
+        }).
+        WithFlow(myFlow).
+        WithProviders(myProvider).
+        WithHealthServer(":8081").
+        WithMetrics(core.NewPrometheusExporter()).
         Run()
 
     if err != nil {
@@ -437,6 +513,8 @@ func main() {
         WithFlow(flows.DataSyncFlow).
         WithProviders(jiraProvider, slackProvider).
         WithWebhookServer(":8080").
+        WithHealthServer(":8081").
+        WithMetrics(core.NewPrometheusExporter()).
         Run()
 
     if err != nil {

@@ -65,6 +65,27 @@ type RetryPolicy struct {
 
 Defines retry behavior for failed activities.
 
+### CursorUpdateConfig
+
+```go
+type CursorUpdateConfig struct {
+    Source string
+    Field  string
+}
+```
+
+Defines how a node updates a cursor after execution. `Source` identifies the data source and `Field` names the output struct field to extract as the cursor position.
+
+### Window
+
+```go
+type Window struct {
+    Size int // max items per batch (0 = disabled, fetch all)
+}
+```
+
+Configures batched/windowed processing for a node. When attached to a node in a parallel step, the framework loops: fetch batch, run downstream pipeline, persist cursors, repeat.
+
 ## Constructor
 
 ### NewNode
@@ -216,6 +237,98 @@ limiter := core.NewSharedRateLimiter("jira-api", 100, time.Minute)
 fetchNode := jira.FetchIssues(fetchInput).WithSharedRateLimit(limiter)
 searchNode := jira.SearchJQL(searchInput).WithSharedRateLimit(limiter)
 ```
+
+### WithValidation
+
+```go
+func (n *Node[I, O]) WithValidation() *Node[I, O]
+```
+
+Enables input validation using struct tags before execution.
+
+Supported validation tags: `required`, `min=N`, `max=N`, `minlen=N`, `maxlen=N`, `oneof=a|b|c`.
+
+**Returns:** `*Node[I, O]` for method chaining
+
+**Example:**
+```go
+type Input struct {
+    Name string `validate:"required"`
+    Age  int    `validate:"min=0,max=150"`
+}
+
+node := core.NewNode("validate-input", myActivity, input).WithValidation()
+```
+
+### WithErrorClassifier
+
+```go
+func (n *Node[I, O]) WithErrorClassifier(fn ErrorClassifier) *Node[I, O]
+```
+
+Sets a function to classify errors for retry decisions. Terminal errors are marked as non-retryable for Temporal.
+
+**Parameters:**
+- `fn` - Error classification function
+
+**Returns:** `*Node[I, O]` for method chaining
+
+**Example:**
+```go
+node := jira.FetchIssues(input).WithErrorClassifier(core.HTTPErrorClassifier)
+```
+
+### WithCursorUpdate
+
+```go
+func (n *Node[I, O]) WithCursorUpdate(source, field string) *Node[I, O]
+```
+
+Configures the node to update a cursor after successful execution. The named field is extracted from the activity output and persisted as the cursor position. Supports `time.Time`, `*time.Time`, and `string` field types.
+
+**Parameters:**
+- `source` - Cursor source identifier (e.g., "jira", "confluence")
+- `field` - Output struct field name to extract
+
+**Returns:** `*Node[I, O]` for method chaining
+
+**Example:**
+```go
+node := jira.FetchIssues(input).
+    WithCursorUpdate("jira", "LastUpdated")
+```
+
+### WithWindow
+
+```go
+func (n *Node[I, O]) WithWindow(w Window) *Node[I, O]
+```
+
+Configures batched/windowed processing for this node. When used in a parallel step, the framework runs the downstream pipeline per batch instead of waiting for all data.
+
+The framework injects `WindowCursor` and `WindowSize` fields into the node's input struct via reflection.
+
+**Parameters:**
+- `w` - Window configuration
+
+**Returns:** `*Node[I, O]` for method chaining
+
+**Example:**
+```go
+node := jira.FetchIssues(input).
+    WithWindow(core.Window{Size: 100}).
+    WithCursorUpdate("jira", "LastUpdated")
+```
+
+### WindowConfig
+
+```go
+func (n *Node[I, O]) WindowConfig() Window
+```
+
+Returns the window configuration. Returns zero `Window` if not set.
+
+**Returns:** `Window`
 
 ### As
 
@@ -375,7 +488,9 @@ func main() {
         WithTimeout(10 * time.Minute).
         WithRetry(core.RetryPolicy{
             MaximumAttempts: 5,
-        })
+        }).
+        WithWindow(core.Window{Size: 100}).
+        WithCursorUpdate("jira", "LastUpdated")
 
     // Node with compensation
     createNode := orders.Create(orderInput).

@@ -240,6 +240,28 @@ upsertNode := qdrant.Upsert(qdrant.UpsertInput{
 })
 ```
 
+#### Automatic Payload Fields
+
+When upserting embeddings from a DataRef, the Upsert activity automatically adds metadata to each point's payload:
+
+- `source_id` — the original document ID
+- `source` — the data source identifier (e.g., "jira", "confluence", "pagerduty"), included when `Document.Source` is non-empty
+
+These fields enable filtering search results by origin:
+
+```go
+searchNode := qdrant.Search(qdrant.SearchInput{
+    Collection: "knowledge",
+    Vector:     queryVector,
+    Limit:      10,
+    Filter: &qdrant.Filter{
+        Must: []qdrant.Condition{
+            {Field: "source", Match: qdrant.Match{Value: "jira"}},
+        },
+    },
+})
+```
+
 ### UpsertBatch
 
 Inserts points in batches for large datasets.
