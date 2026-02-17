@@ -55,6 +55,10 @@ func main() {
 }
 ```
 
+## What's New
+
+See the **[v0.2.0-alpha release notes](/docs/releases/v0.2.0-alpha/)** for the latest changes, including windowed processing, automatic scheduling, and cursor-based incremental sync.
+
 ## Getting Started
 
 Ready to build your first workflow?
