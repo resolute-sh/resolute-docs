@@ -70,6 +70,9 @@ flow := core.NewFlow("my-flow").
 | `.TriggeredBy(trigger)` | Set how the flow is initiated |
 | `.Then(node)` | Add a sequential step |
 | `.ThenParallel(name, ...nodes)` | Add parallel nodes that execute concurrently |
+| `.ThenGate(name, config)` | Add a gate step that pauses until a signal is received |
+| `.ThenChildren(name, config)` | Add a step that spawns child workflows |
+| `.WithHooks(hooks)` | Attach lifecycle callbacks (BeforeFlow, AfterNode, etc.) |
 | `.WithState(config)` | Configure state persistence backend |
 | `.Build()` | Validate and finalize the flow |
 
@@ -132,6 +135,60 @@ Parallel execution:
                     │  aggregate  │
                     └─────────────┘
 ```
+
+## Gate Steps
+
+Use `.ThenGate()` to pause execution until an external signal arrives:
+
+```go
+flow := core.NewFlow("deploy-pipeline").
+    TriggeredBy(core.Manual("api")).
+    Then(runTestsNode).
+    ThenGate("approval", core.GateConfig{
+        SignalName: "deploy-approval",
+        Timeout:    24 * time.Hour,
+    }).
+    Then(deployNode).
+    Build()
+```
+
+The flow pauses at the gate until a Temporal signal with a `GateResult` is received. See **[Gates](/docs/concepts/gates/)** for details.
+
+## Child Flow Steps
+
+Use `.ThenChildren()` to spawn child workflows from a parent flow:
+
+```go
+flow := core.NewFlow("batch-processor").
+    TriggeredBy(core.Schedule("0 * * * *")).
+    Then(fetchItemsNode).
+    ThenChildren("process-items", core.ChildFlowConfig{
+        Flow:        itemProcessingFlow,
+        InputMapper: deriveChildInputs,
+    }).
+    Then(aggregateNode).
+    Build()
+```
+
+Children execute in parallel by default. Set `Sequential: true` for ordered processing. See **[Child Flows](/docs/concepts/child-flows/)** for details.
+
+## Lifecycle Hooks
+
+Attach callbacks for observability and monitoring:
+
+```go
+flow := core.NewFlow("monitored-flow").
+    TriggeredBy(core.Schedule("*/15 * * * *")).
+    WithHooks(&core.FlowHooks{
+        AfterNode: func(ctx core.HookContext) {
+            log.Info("node done", "node", ctx.NodeName, "duration", ctx.Duration)
+        },
+    }).
+    Then(fetchNode).
+    Build()
+```
+
+See **[Hooks](/docs/concepts/hooks/)** for the full callback reference.
 
 ## State Configuration
 
@@ -345,9 +402,32 @@ func TestMyFlow(t *testing.T) {
 
 Resolute flows compile down to Temporal workflows. The FlowBuilder DSL provides a more declarative way to define workflows while preserving Temporal's durability guarantees.
 
+## Dynamic Flow Construction
+
+For flows whose structure varies at runtime, use `FlowTemplate` instead of `FlowBuilder`:
+
+```go
+tmpl := core.NewFlowTemplate("dynamic-pipeline").
+    TriggeredBy(core.Manual("api"))
+
+tmpl.AddStep(fetchNode)
+if config.NeedsApproval {
+    tmpl.AddGate("review", core.GateConfig{SignalName: "review"})
+}
+tmpl.AddStep(processNode)
+
+flow := tmpl.Build()
+```
+
+See **[Templates](/docs/concepts/templates/)** for the full API.
+
 ## See Also
 
 - **[Nodes](/docs/concepts/nodes/)** - Building blocks of flows
+- **[Gates](/docs/concepts/gates/)** - Pausing flows for signals
+- **[Child Flows](/docs/concepts/child-flows/)** - Spawning child workflows
+- **[Templates](/docs/concepts/templates/)** - Dynamic flow construction
+- **[Hooks](/docs/concepts/hooks/)** - Lifecycle callbacks
 - **[Triggers](/docs/concepts/triggers/)** - How flows start
 - **[State](/docs/concepts/state/)** - Runtime state and cursors
 - **[Testing](/docs/guides/testing/flow-tester/)** - Testing flows without Temporal

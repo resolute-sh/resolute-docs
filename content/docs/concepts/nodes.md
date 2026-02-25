@@ -203,6 +203,19 @@ processNode := core.NewNode("process", processData, ProcessInput{
 Available markers:
 - `core.CursorFor(source)` - Resolves to the cursor for the named source
 - `core.Output(node, field)` - Resolves to a field from a previous node's output
+- `core.InputData(key)` - Resolves to a value from the flow's initial input (useful for webhook payloads)
+
+### InputData Marker
+
+Webhook-triggered flows store payload data in `FlowInput`. The `InputData` marker provides access from activity input structs:
+
+```go
+bitbucket.ParseWebhook(bitbucket.ParseWebhookInput{
+    RawPayload: core.InputData("webhook_payload"),
+})
+```
+
+The marker creates an `{{input:key}}` placeholder that the framework resolves at execution time via `FlowState.GetInputData()`.
 
 ## Node Execution
 
@@ -252,6 +265,18 @@ type ExecutableNode interface {
 ```
 
 This interface allows flows to work with nodes polymorphically, regardless of their specific input/output types.
+
+### Specialized Node Types
+
+Beyond the generic `Node[I, O]`, Resolute provides specialized node types that also implement `ExecutableNode`:
+
+| Node Type | Purpose | Created Via |
+|-----------|---------|-------------|
+| `Node[I, O]` | Wraps a Temporal activity | `core.NewNode(name, fn, input)` |
+| `GateNode` | Pauses flow until signal received | `core.NewGateNode(name, config)` |
+| `ChildFlowNode` | Spawns child workflows | `core.NewChildFlowNode(name, config)` |
+
+See **[Gates](/docs/concepts/gates/)** and **[Child Flows](/docs/concepts/child-flows/)** for details on these specialized types.
 
 ## Node Methods Reference
 
@@ -392,6 +417,8 @@ Node names appear in Temporal UI and logs:
 ## See Also
 
 - **[Flows](/docs/concepts/flows/)** - How nodes compose into workflows
+- **[Gates](/docs/concepts/gates/)** - Gate nodes for approval workflows
+- **[Child Flows](/docs/concepts/child-flows/)** - Child flow nodes for workflow composition
 - **[State](/docs/concepts/state/)** - How node outputs are stored
 - **[Providers](/docs/concepts/providers/)** - Collections of related nodes
 - **[Rate Limiting](/docs/guides/advanced-patterns/rate-limiting/)** - Advanced rate limiting patterns
