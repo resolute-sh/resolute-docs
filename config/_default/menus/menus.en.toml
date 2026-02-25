@@ -4,7 +4,7 @@
   weight = 10
 
 [[main]]
-  name = "v0.2.0-alpha"
+  name = "v0.4.0-alpha"
   url = "https://github.com/resolute-sh/resolute/releases"
   weight = 20
   [main.params]
