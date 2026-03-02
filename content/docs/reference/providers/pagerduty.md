@@ -166,6 +166,56 @@ type ScheduleRef struct {
 
 ## Activities
 
+### ParseWebhook
+
+Parses a PagerDuty V3 webhook payload and extracts incident details. Optionally verifies the HMAC-SHA256 signature and filters by allowed services.
+
+**Input:**
+```go
+type ParseWebhookInput struct {
+    RawPayload      string   // Raw JSON webhook body
+    RawHeaders      string   // JSON-serialized HTTP headers
+    WebhookSecret   string   // PagerDuty webhook secret (optional, enables signature verification)
+    AllowedServices []string // Service name allowlist (empty = all services)
+}
+```
+
+**Output:**
+```go
+type ParseWebhookOutput struct {
+    IncidentID  string // PagerDuty incident ID
+    EventType   string // e.g., "incident.triggered"
+    ServiceName string // Originating service name
+    Title       string // Incident title
+    UserPrompt  string // Pre-formatted prompt for downstream LLM agents
+    Skipped     bool   // True if the service was filtered out
+}
+```
+
+**Node Factory:**
+```go
+func ParseWebhook(input ParseWebhookInput) *core.Node[ParseWebhookInput, ParseWebhookOutput]
+```
+
+**Example:**
+```go
+parseNode := pagerduty.ParseWebhook(pagerduty.ParseWebhookInput{
+    RawPayload:      core.InputData("webhook_payload"),
+    RawHeaders:      core.InputData("webhook_headers"),
+    WebhookSecret:   os.Getenv("PAGERDUTY_WEBHOOK_SECRET"),
+    AllowedServices: []string{"api-gateway", "payment-service"},
+})
+```
+
+When `Skipped` is `true`, the incident was from a service not in the allowlist. Use a `When` gate to skip downstream processing:
+
+```go
+When(func(s *core.FlowState) bool {
+    webhook := core.GetOr(s, "webhook", pagerduty.ParseWebhookOutput{})
+    return !webhook.Skipped
+})
+```
+
 ### TriggerEvent
 
 Triggers a new event (creates an incident).

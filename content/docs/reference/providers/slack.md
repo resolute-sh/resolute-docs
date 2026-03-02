@@ -133,6 +133,71 @@ notifyNode := slack.SendMessage(slack.SendMessageInput{
 
 If both `Text` and `Blocks` are empty, the message is not sent and `Sent` returns `false`.
 
+### NotifyReport
+
+Sends a structured Block Kit report notification with metadata (cost, duration, LLM info) and automatic markdown-to-Slack-mrkdwn conversion. Handles both success and failure states.
+
+**Input:**
+```go
+type NotifyReportInput struct {
+    WebhookURL  string // Slack Incoming Webhook URL
+    Header      string // Success header text
+    Label1      string // First metadata label (e.g., "Incident")
+    Value1      string // First metadata value
+    Label2      string // Second metadata label (e.g., "Service")
+    Value2      string // Second metadata value
+    Body        string // Report body (Markdown — auto-converted to Slack mrkdwn)
+    CostUSD     string // Cost in USD
+    Duration    string // Execution duration
+    TurnsUsed   string // Number of LLM turns
+    Succeeded   string // "true" for success layout, anything else for failure
+    LLMProvider string // Provider name (e.g., "anthropic")
+    LLMModel    string // Model name (e.g., "claude-sonnet-4-6")
+    FailHeader  string // Header shown on failure
+    FailMessage string // Message shown on failure
+}
+```
+
+**Output:**
+```go
+type NotifyReportOutput struct {
+    Notified bool
+}
+```
+
+**Node Factory:**
+```go
+func NotifyReport(input NotifyReportInput) *core.Node[NotifyReportInput, NotifyReportOutput]
+```
+
+**Example:**
+```go
+reportNode := slack.NotifyReport(slack.NotifyReportInput{
+    WebhookURL:  os.Getenv("SLACK_WEBHOOK_URL"),
+    Header:      "Incident Review Complete",
+    Label1:      "Incident",
+    Value1:      core.Output("webhook.IncidentID"),
+    Label2:      "Service",
+    Value2:      core.Output("webhook.ServiceName"),
+    Body:        core.Output("review.Response"),
+    CostUSD:     core.Output("review.CostUSD"),
+    Duration:    core.Output("review.Duration"),
+    TurnsUsed:   core.Output("review.TurnsUsed"),
+    Succeeded:   core.Output("review.Succeeded"),
+    LLMProvider: "anthropic",
+    LLMModel:    "claude-sonnet-4-6",
+    FailHeader:  "Review Failed",
+    FailMessage: "The automated review failed. Check Temporal UI for details.",
+})
+```
+
+The activity automatically:
+- Converts Markdown headings, bold, and links to Slack mrkdwn format
+- Splits long bodies into multiple section blocks (3000 char limit per block)
+- Uses `---` horizontal rules as block dividers
+- Caps output at 50 Slack blocks
+- Returns `Notified: false` (no error) if `WebhookURL` is empty
+
 ## Usage Patterns
 
 ### Notification at End of Pipeline
