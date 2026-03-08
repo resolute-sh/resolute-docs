@@ -337,4 +337,3 @@ The webhook endpoint listens on port 8080. Configure your incident management pl
 - **[PagerDuty Provider](/docs/reference/providers/pagerduty/)** — Webhook parsing and incident APIs
 - **[Slack Provider](/docs/reference/providers/slack/)** — NotifyReport and SendMessage
 - **[Model Benchmarking](/docs/guides/deployment/model-benchmarking/)** — Comparing LLM models
-- **[Incident Response Example](/docs/examples/incident-response/)** — Traditional (non-agentic) incident automation
