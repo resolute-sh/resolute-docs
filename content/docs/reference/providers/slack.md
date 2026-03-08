@@ -12,7 +12,7 @@ The Slack provider sends messages to Slack channels via incoming webhooks with B
 ## Installation
 
 ```bash
-go get github.com/resolute-sh/resolute-slack@v0.4.0-alpha
+go get github.com/resolute-sh/resolute-slack@v0.2.1-alpha
 ```
 
 ## Configuration

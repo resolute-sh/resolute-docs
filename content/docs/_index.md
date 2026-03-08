@@ -6,7 +6,7 @@ weight: 1
 
 # Resolute
 
-[![Version](https://img.shields.io/badge/version-v0.4.0--alpha-blue)](https://github.com/resolute-sh/resolute/releases) [![Go](https://img.shields.io/badge/Go-1.22+-00ADD8?logo=go)](https://go.dev) [![License](https://img.shields.io/badge/license-MIT-green)](https://github.com/resolute-sh/resolute/blob/main/LICENSE)
+[![Version](https://img.shields.io/badge/version-v0.5.1--alpha-blue)](https://github.com/resolute-sh/resolute/releases) [![Go](https://img.shields.io/badge/Go-1.22+-00ADD8?logo=go)](https://go.dev) [![License](https://img.shields.io/badge/license-MIT-green)](https://github.com/resolute-sh/resolute/blob/main/LICENSE)
 
 **Agent Orchestration as Code** - Build fault-tolerant workflows with Go.
 
@@ -57,7 +57,7 @@ func main() {
 
 ## What's New
 
-See the **[v0.4.0-alpha release notes](/docs/releases/v0.4.0-alpha/)** for the latest changes, including flow hooks, gate nodes, child workflows, dynamic templates, and new Bitbucket/Slack providers.
+See the **[v0.5.0-alpha release notes](/docs/releases/v0.5.0-alpha/)** for the latest changes, including the agent child workflow refactor, multi-model LLM support, agent observability, and Slack report notifications.
 
 ## Getting Started
 

@@ -12,7 +12,7 @@ The Bitbucket provider integrates with Bitbucket Cloud for webhook-driven workfl
 ## Installation
 
 ```bash
-go get github.com/resolute-sh/resolute-bitbucket@v0.4.0-alpha
+go get github.com/resolute-sh/resolute-bitbucket@latest
 ```
 
 ## Configuration
@@ -204,4 +204,4 @@ processNode := core.NewNode("process", processActivity, ProcessInput{}).
 
 - **[Slack Provider](/docs/reference/providers/slack/)** — Send notifications about PR events
 - **[Triggers](/docs/concepts/triggers/)** — Webhook trigger configuration
-- **[InputData](/docs/releases/v0.4.0-alpha/#inputdata-magic-marker)** — Accessing webhook payloads
+- **[InputData](/docs/concepts/nodes/#inputdata-marker)** — Accessing webhook payloads
