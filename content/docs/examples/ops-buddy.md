@@ -1,11 +1,11 @@
 ---
-title: "PD Incident Reviewer"
-description: "PD Incident Reviewer - Resolute documentation"
+title: "Ops Buddy"
+description: "Ops Buddy - Resolute documentation"
 weight: 50
 toc: true
 ---
 
-# PD Incident Reviewer
+# Ops Buddy
 
 An automated on-call assistant that listens for PagerDuty webhooks, uses an LLM agent with MCP tool servers to gather context from PagerDuty, Jira, Confluence, and Slack, then posts an operator-first incident brief to a Slack channel.
 

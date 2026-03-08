@@ -204,5 +204,5 @@ Is report quality critical?
 ## See Also
 
 - **[Agent Provider](/docs/reference/providers/agent/)** — Agent configuration and observability
-- **[PD Incident Reviewer](/docs/examples/pd-incident-reviewer/)** — Example with benchmark results
+- **[Ops Buddy](/docs/examples/ops-buddy/)** — Example with benchmark results
 - **[Worker Configuration](/docs/guides/deployment/worker-configuration/)** — Deployment settings

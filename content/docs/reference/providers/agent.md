@@ -399,5 +399,5 @@ agentNode := agent.Node("ops", agent.NodeConfig{
 
 - **[PagerDuty Provider](/docs/reference/providers/pagerduty/)** — Incident management
 - **[Slack Provider](/docs/reference/providers/slack/)** — Notifications
-- **[PD Incident Reviewer Example](/docs/examples/pd-incident-reviewer/)** — Complete working example
+- **[Ops Buddy Example](/docs/examples/ops-buddy/)** — Complete working example
 - **[Model Benchmarking](/docs/guides/deployment/model-benchmarking/)** — Comparing LLM models for agentic workflows
