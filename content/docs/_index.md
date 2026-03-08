@@ -32,7 +32,7 @@ func main() {
     flow := core.NewFlow("data-sync").
         TriggeredBy(core.Schedule("0 2 * * *")).  // Run daily at 2 AM
         Then(jira.FetchIssues(jira.Input{
-            Project: "PLATFORM",
+            Project: "DEMO",
             Since:   core.CursorFor("jira"),      // Incremental sync
         })).
         Then(transform.ChunkDocuments(transform.Input{

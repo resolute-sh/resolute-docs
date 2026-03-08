@@ -16,7 +16,7 @@ seo:
 flow := core.NewFlow("knowledge-sync").
     TriggeredBy(core.Schedule("0 * * * *")).
     Then(jira.FetchIssues(jira.Input{
-        Project: "PLATFORM",
+        Project: "DEMO",
         Since:   core.CursorFor("jira"),
     })).
     Then(transform.ChunkDocuments(transform.Input{
