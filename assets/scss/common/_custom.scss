@@ -228,25 +228,16 @@
     border: 1px solid var(--bs-border-color);
     overflow: hidden;
     background: var(--bs-tertiary-bg);
-  }
-
-  .arch-pre {
-    margin: 0;
-    padding: 1.5rem 2rem;
-    overflow-x: auto;
-    background: transparent;
-    font-size: 0.78rem;
-    line-height: 1.5;
-    color: var(--bs-body-color);
+    padding: 1.5rem 1rem;
 
     @media (min-width: 768px) {
-      font-size: 0.85rem;
+      padding: 2rem;
     }
+  }
 
-    code {
-      color: inherit;
-      background: transparent;
-    }
+  .mermaid {
+    margin: 0;
+    padding: 0;
   }
 }
 

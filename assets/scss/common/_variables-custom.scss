@@ -1,1 +1,8 @@
-// Put your custom SCSS variables here
+// Oxide-tuned dark mode: teal-tinted near-blacks instead of Bootstrap's default grays
+
+$body-bg-dark:              #080f11;
+$body-secondary-bg-dark:    #141b1d;
+$body-tertiary-bg-dark:     #101618;
+$body-color-dark:           #d7d8d9;
+$body-emphasis-color-dark:  #feffff;
+$border-color-dark:         #2d3335;

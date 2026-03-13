@@ -110,40 +110,31 @@
       <div class="row justify-content-center">
         <div class="col-lg-10">
           <div class="architecture-diagram">
-<pre class="arch-pre"><code>Webhook / Schedule / Signal
-        |
-        v
-┌─────────────────────────────────────────────────────────┐
-│                      Flow (Workflow)                     │
-│                                                          │
-│   ┌──────────────┐                                       │
-│   │  Parse Input  │                                      │
-│   └──────┬───────┘                                       │
-│          │                                               │
-│          v                                               │
-│   ┌──────────────────────────────────────────────────┐   │
-│   │           Agent (Child Workflow)                  │   │
-│   │                                                   │   │
-│   │   ┌───────────┐    ┌──────────────────────────┐  │   │
-│   │   │  LLM Call  │──▶│  Tool Dispatch            │  │   │
-│   │   └───────────┘    │  ├─ mcp__pagerduty__*     │  │   │
-│   │        ▲           │  ├─ mcp__jira__*          │  │   │
-│   │        │           │  ├─ mcp__slack__*         │  │   │
-│   │        └───────────│  └─ provider activities   │  │   │
-│   │                    └──────────────────────────┘  │   │
-│   │                                                   │   │
-│   │   Compaction · Loop Detection · Cost Tracking     │   │
-│   └───────────────────────┬──────────────────────────┘   │
-│          │                │                               │
-│          │   Observer ◄───┘ (signal-based verdicts)       │
-│          v                                               │
-│   ┌──────────────┐                                       │
-│   │    Notify     │                                      │
-│   └──────────────┘                                       │
-└─────────────────────────────────────────────────────────┘
-        |
-        v
-   Temporal Server  (history · task queues · visibility)</code></pre>
+            <div class="mermaid text-center">
+flowchart TD
+    trigger(["Webhook / Schedule / Signal"])
+    trigger --> parse
+
+    subgraph flow ["Flow (Temporal Workflow)"]
+        parse["Parse Input"]
+        parse --> agent
+
+        subgraph agent ["Agent (Child Workflow)"]
+            llm["LLM Call"] -->|"tool_use"| tools["Tool Dispatch"]
+            tools -->|"tool_result"| llm
+            tools --- mcp_pd["mcp__pagerduty__*"]
+            tools --- mcp_jira["mcp__jira__*"]
+            tools --- mcp_slack["mcp__slack__*"]
+            tools --- providers["provider activities"]
+            compact["Compaction &middot; Loop Detection &middot; Cost Tracking"]
+        end
+
+        agent -->|"signal"| observer["Observer (verdicts)"]
+        agent --> notify["Notify"]
+    end
+
+    notify --> temporal[("Temporal Server")]
+            </div>
           </div>
         </div>
       </div>
