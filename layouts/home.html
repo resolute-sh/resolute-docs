@@ -1,13 +1,20 @@
 {{ define "main" }}
-<section class="section container-fluid mt-n3 pb-3">
+<section class="section section-hero container-fluid mt-n3 pb-3">
   <div class="row justify-content-center">
     <div class="col-lg-12 text-center">
-      <h1>{{ .Title }}</h1>
+      <h1 class="hero-title">{{ .Params.lead | safeHTML }}</h1>
     </div>
     <div class="col-lg-9 col-xl-8 text-center">
-      <p class="lead">{{ .Params.lead | safeHTML }}</p>
-      <a class="btn btn-primary btn-cta rounded-pill btn-lg my-3" href="/docs/examples/" role="button">{{ i18n "get_started" }}</a>
-      {{ .Content }}
+      <p class="lead hero-subtitle">{{ .Params.subtitle | safeHTML }}</p>
+      <div class="hero-cta">
+        <a class="btn btn-primary btn-cta rounded-pill btn-lg" href="/docs/getting-started/quickstart/" role="button">Get Started</a>
+        <a class="btn btn-outline-secondary rounded-pill btn-lg" href="/docs/examples/ops-buddy/" role="button">See Ops Buddy Example</a>
+      </div>
+    </div>
+    <div class="col-lg-10 col-xl-9">
+      <div class="hero-code-block">
+        {{ .Content }}
+      </div>
     </div>
   </div>
 </section>
@@ -20,34 +27,224 @@
   </div>
   {{ end -}}
   {{ if eq $.Site.Language.LanguageName "English" }}
+
+  {{/* Feature Cards */}}
   <section class="section section-md section-features">
     <div class="container">
+      <div class="row justify-content-center text-center mb-5">
+        <div class="col-lg-8">
+          <h2 class="section-heading">Production-grade agent infrastructure</h2>
+          <p class="section-subheading text-muted">Everything you need to run LLM agents that won't crash, won't blow your budget, and won't go rogue.</p>
+        </div>
+      </div>
       <div class="row justify-content-center text-center mb-4">
-        <div class="col-md-6 col-lg-4">
-          <h2 class="h4">Type-Safe Workflows</h2>
-          <p>Go generics ensure compile-time type safety across your entire pipeline. Catch bugs before they hit production.</p>
+        <div class="col-md-6 col-lg-4 feature-card-col">
+          <div class="feature-card">
+            <div class="feature-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <h3 class="h4 feature-title">Durable Agents</h3>
+            <p>LLM loops run as Temporal child workflows with per-iteration heartbeating. Survive worker crashes mid-conversation — no lost context, no re-running tool calls.</p>
+          </div>
         </div>
-        <div class="col-md-6 col-lg-4">
-          <h2 class="h4">Production-Ready Integrations</h2>
-          <p>Jira, Confluence, Qdrant, PagerDuty, Ollama built-in. Auth, retry, and rate limits handled automatically.</p>
+        <div class="col-md-6 col-lg-4 feature-card-col">
+          <div class="feature-card">
+            <div class="feature-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+            </div>
+            <h3 class="h4 feature-title">MCP + Provider Tools</h3>
+            <p>Connect any MCP server or Resolute provider as agent tools. PagerDuty, Jira, Confluence, Slack, Qdrant, Ollama — 90+ tools out of the box.</p>
+          </div>
         </div>
-        <div class="col-md-6 col-lg-4">
-          <h2 class="h4">Test in Milliseconds</h2>
-          <p>Unit test workflows without infrastructure using FlowTester. Full mocking, call tracking, and assertions.</p>
+        <div class="col-md-6 col-lg-4 feature-card-col">
+          <div class="feature-card">
+            <div class="feature-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </div>
+            <h3 class="h4 feature-title">Observer Pattern</h3>
+            <p>Inspect and override agent decisions between iterations via Temporal signals. Human-in-the-loop oversight without blocking execution.</p>
+          </div>
         </div>
       </div>
       <div class="row justify-content-center text-center">
-        <div class="col-md-6 col-lg-4">
-          <h2 class="h4">Incremental Sync</h2>
-          <p>Cursor-based state management syncs only delta data. Cut API costs by 70% with automatic resume on failure.</p>
+        <div class="col-md-6 col-lg-4 feature-card-col">
+          <div class="feature-card">
+            <div class="feature-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            </div>
+            <h3 class="h4 feature-title">Cost Guardrails</h3>
+            <p>Per-run, per-hour, and per-day budget limits. Process-global tracking across all concurrent flows. Never wake up to a surprise bill.</p>
+          </div>
         </div>
-        <div class="col-md-6 col-lg-4">
-          <h2 class="h4">Enterprise Reliability</h2>
-          <p>Saga compensation for rollbacks, parallel execution for speed, automatic retry with backoff. Full audit trail in Temporal UI.</p>
+        <div class="col-md-6 col-lg-4 feature-card-col">
+          <div class="feature-card">
+            <div class="feature-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            </div>
+            <h3 class="h4 feature-title">Type-Safe Composition</h3>
+            <p>Go generics enforce compile-time type safety across your entire pipeline. Fluent builder API. Unit test flows without running Temporal.</p>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-4 feature-card-col">
+          <div class="feature-card">
+            <div class="feature-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            </div>
+            <h3 class="h4 feature-title">Context Compaction</h3>
+            <p>Automatic summarization when token count exceeds threshold. Per-turn tracking for post-hoc analysis. Long-running agents that stay sharp.</p>
+          </div>
         </div>
       </div>
     </div>
   </section>
+
+  {{/* Architecture */}}
+  <section class="section section-md section-architecture">
+    <div class="container">
+      <div class="row justify-content-center text-center mb-4">
+        <div class="col-lg-8">
+          <h2 class="section-heading">Agents embedded in durable workflows</h2>
+          <p class="section-subheading text-muted">Not "agent framework OR workflow framework" — agents as first-class nodes inside fault-tolerant flows.</p>
+        </div>
+      </div>
+      <div class="row justify-content-center">
+        <div class="col-lg-10">
+          <div class="architecture-diagram">
+<pre class="arch-pre"><code>Webhook / Schedule / Signal
+        |
+        v
+┌─────────────────────────────────────────────────────────┐
+│                      Flow (Workflow)                     │
+│                                                          │
+│   ┌──────────────┐                                       │
+│   │  Parse Input  │                                      │
+│   └──────┬───────┘                                       │
+│          │                                               │
+│          v                                               │
+│   ┌──────────────────────────────────────────────────┐   │
+│   │           Agent (Child Workflow)                  │   │
+│   │                                                   │   │
+│   │   ┌───────────┐    ┌──────────────────────────┐  │   │
+│   │   │  LLM Call  │──▶│  Tool Dispatch            │  │   │
+│   │   └───────────┘    │  ├─ mcp__pagerduty__*     │  │   │
+│   │        ▲           │  ├─ mcp__jira__*          │  │   │
+│   │        │           │  ├─ mcp__slack__*         │  │   │
+│   │        └───────────│  └─ provider activities   │  │   │
+│   │                    └──────────────────────────┘  │   │
+│   │                                                   │   │
+│   │   Compaction · Loop Detection · Cost Tracking     │   │
+│   └───────────────────────┬──────────────────────────┘   │
+│          │                │                               │
+│          │   Observer ◄───┘ (signal-based verdicts)       │
+│          v                                               │
+│   ┌──────────────┐                                       │
+│   │    Notify     │                                      │
+│   └──────────────┘                                       │
+└─────────────────────────────────────────────────────────┘
+        |
+        v
+   Temporal Server  (history · task queues · visibility)</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {{/* Ops Buddy Showcase */}}
+  <section class="section section-md section-showcase">
+    <div class="container">
+      <div class="row justify-content-center text-center mb-4">
+        <div class="col-lg-8">
+          <h2 class="section-heading">Battle-tested: Ops Buddy</h2>
+          <p class="section-subheading text-muted">PagerDuty fires, an agent gathers context from 4 sources, and your on-call engineer gets a ready-to-act incident brief in Slack — in under 2 minutes.</p>
+        </div>
+      </div>
+      <div class="row justify-content-center mb-4">
+        <div class="col-lg-10">
+          <div class="showcase-terminal">
+            <div class="terminal-header">
+              <span class="terminal-dot terminal-dot-red"></span>
+              <span class="terminal-dot terminal-dot-yellow"></span>
+              <span class="terminal-dot terminal-dot-green"></span>
+              <span class="terminal-title">Incident Brief — API Gateway 502s</span>
+            </div>
+            <div class="terminal-body">
+<pre><code><strong>> NEW ISSUE</strong> | Urgency: High | Service: api-gateway | ID: P1234567
+
+<strong>What Do I Do Right Now?</strong>
+1. Check pod logs for user-service (CrashLoopBackOff detected)
+2. Verify upstream health on monitoring dashboard
+3. If > 50% error rate, escalate to platform team
+
+<strong>Has This Happened Before?</strong>
+- Feb 15: Similar 502 spike, resolved by restart (12 min)
+- Jan 28: OOM kill, resolved by memory limit increase (25 min)
+- Pattern: 3rd occurrence in 35 days — root cause is memory leak
+
+<strong>Open Tickets</strong>
+| PLAT-892 | user-service memory leak | In Progress | @jane |</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row justify-content-center">
+        <div class="col-lg-8">
+          <div class="benchmark-table">
+            <h3 class="h5 text-center mb-3">Multi-model benchmarks on the same incident</h3>
+            <table class="table table-sm">
+              <thead>
+                <tr>
+                  <th>Model</th>
+                  <th>Duration</th>
+                  <th>Iterations</th>
+                  <th>Cost</th>
+                  <th>Quality</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>claude-sonnet-4-6</code></td>
+                  <td>~2m</td>
+                  <td>4</td>
+                  <td>~$0.65</td>
+                  <td>Excellent</td>
+                </tr>
+                <tr>
+                  <td><code>claude-haiku-4-5</code></td>
+                  <td>~1.5m</td>
+                  <td>9</td>
+                  <td>~$0.28</td>
+                  <td>Good</td>
+                </tr>
+                <tr>
+                  <td><code>qwen3.5-397b</code> (cloud)</td>
+                  <td>~1.5m</td>
+                  <td>3</td>
+                  <td>$0.00</td>
+                  <td>Good</td>
+                </tr>
+              </tbody>
+            </table>
+            <p class="text-center text-muted mt-2"><small>See <a href="/docs/guides/deployment/model-benchmarking/">Model Benchmarking</a> for methodology</small></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {{/* CTA */}}
+  <section class="section section-md section-cta-bottom">
+    <div class="container">
+      <div class="row justify-content-center text-center">
+        <div class="col-lg-7">
+          <h2 class="mb-3">Start building</h2>
+          <p class="text-muted mb-4">Resolute is open source and free. Get from zero to a running agent workflow in 10 minutes.</p>
+          <a class="btn btn-primary rounded-pill btn-lg px-4" href="/docs/getting-started/quickstart/" role="button">Quickstart Guide</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
   {{ end }}
 {{ end }}
 
@@ -56,8 +253,8 @@
 <section class="section section-md container-fluid bg-light">
   <div class="row justify-content-center text-center">
     <div class="col-lg-7">
-      <h2 class="mt-2">Start building with Doks today</h2>
-      <a class="btn btn-primary rounded-pill px-4 my-2" href="/docs/{{ if site.Params.doks.docsVersioning }}{{ site.Params.doks.docsVersion }}/{{ end }}prologue/introduction/" role="button">{{ i18n "get-started" }}</a>
+      <h2 class="mt-2">Start building with Resolute today</h2>
+      <a class="btn btn-primary rounded-pill px-4 my-2" href="/docs/getting-started/quickstart/" role="button">{{ i18n "get-started" }}</a>
     </div>
   </div>
 </section>
