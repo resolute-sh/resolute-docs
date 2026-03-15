@@ -80,14 +80,13 @@ mainSections = ["docs"]
 
   krokiURL = "https://kroki.io" # "https://kroki.io" (default) or custom URL like http://localhost:8000.
 
-  # SCSS colors — Bedrock palette (Slate + Teal)
-  # backGround = "yellowgreen"
+  # SCSS colors — Cool indigo + blue accent (from BSaaE wireframes)
   ## Dark theme
-  # textDark = "#dee2e6"
-  accentDark = "#14b8a6"
+  textDark = "#7a7a94"
+  accentDark = "#6390f0"
   ## Light theme
-  # textLight = "#1d2d35"
-  accentLight = "#0d9488"
+  textLight = "#2a2a3c"
+  accentLight = "#4a72d0"
 
   # [doks.menu]
   #   [doks.menu.section]
